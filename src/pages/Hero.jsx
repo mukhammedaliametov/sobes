@@ -1,19 +1,25 @@
 import React, { useState } from "react";
-import PageTitle from "../components/PageTitle";
 import { Link } from "react-router-dom";
 import Data from "../../server.json";
 import Select from "../components/Select";
+import { createSlug } from "../components/KrilToLatin";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { FaAngleRight } from "react-icons/fa";
 
 const Hero = () => {
+  const [slice, setSlice] = useState(false);
+  const initialPerson = Data.slice(0, 9);
 
-    const [slice, setSlice] = useState(false);
-    const initialPerson = Data.slice(0, 9);
-    
   return (
     <div className="pt-[110px] w-full flex justify-center">
       <div className="max-w-[1200px] w-full ">
-        <PageTitle name="Запись к врачу" url="/" />
+        <p className="flex items-center gap-[10px] font-roboto">
+          <Link to='' className="text-[#A3A3A3]">
+            Главная
+          </Link>{" "}
+          <FaAngleRight color="#A3A3A3" />{" "}
+          <span to='/'>Запись к врачу</span>
+        </p>
         <Select />
         <div className="grid grid-cols-3 gap-[25px] my-6">
           {(slice ? Data : initialPerson).map((item, index) => {
@@ -49,7 +55,7 @@ const Hero = () => {
                     {item.speciality}
                   </p>
                   <Link
-                    to=""
+                    to={createSlug(item.name)}
                     className="my-[8px] text-[#42B2FC] group flex items-center"
                   >
                     Записаться на прием{" "}
@@ -61,9 +67,14 @@ const Hero = () => {
           })}
         </div>
         <div className="flex justify-center w-full mb-20">
-          {!slice && <button onClick={() => setSlice(true)} className="bg-[#42B2FC] py-[10px] px-[25px] text-white rounded-[8px] text-center font-montserrat">
-            Показать еще
-          </button>}
+          {!slice && (
+            <button
+              onClick={() => setSlice(true)}
+              className="bg-[#42B2FC] py-[10px] px-[25px] text-white rounded-[8px] text-center font-montserrat"
+            >
+              Показать еще
+            </button>
+          )}
         </div>
       </div>
     </div>
