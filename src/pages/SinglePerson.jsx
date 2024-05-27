@@ -3,7 +3,8 @@ import Data from "../../server.json";
 import { Link, useParams } from "react-router-dom";
 import { createSlug } from "../components/KrilToLatin";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa";
-import {FaArrowRightLong} from 'react-icons/fa6';
+import OtherDoctors from "../components/OtherDoctors";
+import SignUp from "../components/SignUp";
 
 const SinglePerson = () => {
   const { person } = useParams();
@@ -15,11 +16,23 @@ const SinglePerson = () => {
   const initialData = dataFind.times.slice(0, 3);
   const hiddenData = dataFind.times.length - initialData.length;
 
-  const [slice, setSlice] = useState(false);
-  const personFilter = Data.filter((item) => item.jobtitle === dataFind.jobtitle)
+  const [selectedTime, setSelectedTime] = useState('Выберите время приема');
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  
+  const handleTimeSelect = (day, month, time) => {
+    setSelectedTime(`Выбрать ${day} ${month}, ${time}`);
+    setIsButtonDisabled(false);
+  };
+
+  const [form, setForm] = useState();
+  const handleForm = () => setForm(!form);
+  const closeForm = () => setForm(false);
 
   return (
     <div className="pt-[110px] w-full flex justify-center">
+      <div className={form ? "fixed top-0 left-0 right-0 bg-[#00000071] z-20 h-screen flex justify-center items-center" : 'hidden'}>
+        <SignUp closeForm={closeForm} doctorName={dataFind.name} selectedTime={selectedTime} />
+      </div>
       <div className="max-w-[1200px] w-full ">
         <p className="flex items-center gap-[10px] font-roboto mb-[30px]">
           <Link to="/" className="text-[#A3A3A3]">
@@ -67,9 +80,9 @@ const SinglePerson = () => {
                   {item.day} {item.month}, {item.week}
                 </p>
                 <div className="grid grid-cols-12 gap-[10px] py-4">
-                  {item.clock.map((item) => (
-                    <button className="bg-[#E1F1FF] text-[20px] text-[#575757] rounded-[5px] py-[6px] px-[18px] text-center">
-                      {item}
+                  {item.clock.map((time) => (
+                    <button onClick={() => handleTimeSelect(item.day, item.month, time)} className="bg-[#E1F1FF] text-[20px] text-[#575757] rounded-[5px] py-[6px] px-[18px] text-center focus:bg-[#42B2FC] focus:text-white">
+                      {time}
                     </button>
                   ))}
                 </div>
@@ -85,65 +98,16 @@ const SinglePerson = () => {
             </button>
           )}
           <div>
-            <button disabled className="bg-[#42B2FC] py-[15px] px-[25px] text-white rounded-[8px] my-6 opacity-[50%]">Выберите время приема</button>
+            <button
+            onClick={handleForm}
+              disabled={isButtonDisabled}
+              className={isButtonDisabled ? "bg-[#42B2FC] py-[15px] px-[25px] text-white rounded-[8px] my-6 opacity-[50%]" : "bg-[#42B2FC] py-[15px] px-[25px] text-white rounded-[8px] my-6"}
+            >
+              {selectedTime}
+            </button>
           </div>
         </div>
-        <h1 className="text-[32px] mb-6 font-montserrat">Другие врачи</h1>
-        <div className="grid grid-cols-3 gap-[25px] my-6">
-          {(slice ? personFilter : personFilter.slice(0,3)).map((item, index) => {
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-[15px] overflow-hidden group"
-              >
-                <div className="overflow-hidden relative">
-                  <img
-                    src={item.img}
-                    alt="doctor"
-                    className="group-hover:scale-105 duration-300"
-                  />
-                  <div className="absolute w-full h-full top-0 left-0 bg-[#00000048] group-hover:hidden"></div>
-                </div>
-                <div className="py-[15px] px-[20px] flex flex-col gap-[5px] font-montserrat">
-                  <h1 className="text-[20px]">{item.name}</h1>
-                  <p className="text-[14px]">
-                    <span className="text-[#717171]">Должность:</span>{" "}
-                    {item.job}
-                  </p>
-                  <p className="text-[14px]">
-                    <span className="text-[#717171]">Мед. учреждение:</span>{" "}
-                    {item.honey}
-                  </p>
-                  <p className="text-[14px]">
-                    <span className="text-[#717171]">Адрес:</span>{" "}
-                    {item.address}
-                  </p>
-                  <p className="text-[14px]">
-                    <span className="text-[#717171]">Специальность:</span>{" "}
-                    {item.speciality}
-                  </p>
-                  <Link
-                    to={createSlug(item.name)}
-                    className="my-[8px] text-[#42B2FC] group flex items-center"
-                  >
-                    Записаться на прием{" "}
-                    <FaArrowRightLong className="ml-2 group-hover:ml-4 duration-300" />
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex justify-center w-full mb-20">
-          {!slice && (
-            <button
-              onClick={() => setSlice(true)}
-              className="bg-[#42B2FC] py-[10px] px-[25px] text-white rounded-[8px] text-center font-montserrat"
-            >
-              Показать еще
-            </button>
-          )}
-        </div>
+        <OtherDoctors />
       </div>
     </div>
   );
